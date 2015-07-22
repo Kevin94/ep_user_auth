@@ -5,10 +5,13 @@
       "hooks": {
         "expressCreateServer": "ep_user_auth/hooks",
         "eejsBlock_userlist" : "ep_user_auth/hooks",
-        "eejsBlock_indexWrapper" : "ep_user_auth/hooks"
+        "eejsBlock_indexWrapper" : "ep_user_auth/hooks",
+        "eejsBlock_mySettings": "ep_user_auth/hooks",
+        "eejsBlock_styles": "ep_user_auth/hooks",
+        "padUpdate": "ep_user_auth/update"
       },
       "client_hooks" : {
-		"postAceInit" : "ep_user_auth/static/js/login"
+		"postAceInit" : "ep_user_auth/static/js/pad"
       }
     }
   ]

@@ -172,10 +172,8 @@ function registerUser(user, cb) {
 					db.set("confirm2user:"+consString, user.email);
 					var msg = eMailAuth.registrationtext;
 					msg = msg.replace(/<url>/, user.location + "confirm/" + consString);
-					sendMail({
+					sendMail(userWrite, {
 						text: msg,
-						from: eMailAuth.from,
-						to: user.email + " <" + user.email + ">",
 						subject: eMailAuth.registrationsubject
 					});
 					cb(true);
@@ -201,15 +199,56 @@ function getUserForConfirmCode(consString, cb) {
 }
 
 function setToken(user, token) {
+    // TODO clean up anonymous authors
 	db.set("token2author:"+token, user.author);
 	if(user.token && user.token!=token) { // delete old DB entry
-		db.remove("token2author:"+token);
+		db.remove("token2author:"+user.token);
 	}
 	if(!user.token || user.token!=token) {
 		user.token = token;
 		updateUser(user);
 	}
 }
+
+function addSubscription(email, padId) {
+    db.get("subscribers:"+padId, function(err, subscribers){
+        if(!subscribers) 
+            subscribers = {};
+        subscribers[email] = true;
+        db.set("subscribers:"+padId, subscribers);
+    });
+}
+
+function removeSubscription(email, padId) {
+    db.get("subscribers:"+padId, function(err, subscribers){
+        if(subscribers) {
+            delete subscribers[email];
+            db.set("subscribers:"+padId, subscribers);
+        }
+    });
+}
+
+function hasSubscribed(email, padId, cb) {
+    db.get("subscribers:"+padId, function(err, subscribers){
+        if(!subscribers) 
+            cb(false)
+        else
+            cb(subscribers[email]);
+    });
+}
+
+function getSubscribers(padId, cb) {
+    db.get("subscribers:"+padId, function(err, subscribers){
+        if(subscribers)
+            cb(Object.keys(subscribers))
+        else {
+            cb([]);
+            console.error(err);
+        }
+    });
+}
+
+
 
 var emailserver = email.server.connect({
 	user: eMailAuth.user,
@@ -220,12 +259,16 @@ var emailserver = email.server.connect({
 	tls: eMailAuth.tls
 });
 
-function sendMail(message) {
-	var nodemailer = require('nodemailer');
-	var transport = nodemailer.createTransport("sendmail");
-	if (eMailAuth.smtp == "false")
-		transport.sendMail(message);
-	else {
+function sendMail(user, message) {
+    message.from =  eMailAuth.from;
+    message.to =  user.fullname + " <" + user.email + ">";
+
+	if (eMailAuth.smtp == "false") {
+	    var nodemailer = require('nodemailer');
+	    var transport = nodemailer.createTransport("sendmail");
+	    transport.sendMail(message);
+    }
+    else {
 		emailserver.send(message, function (err) {
 			if (err) {
 				log('error', err);
@@ -235,15 +278,21 @@ function sendMail(message) {
 }
 
 module.exports = {
-	changePw: changePw,
+    getRandomString: getRandomString,
+    sendMail: sendMail,
+    
+    changePw: changePw,
 	deleteUser: deleteUser,
-	getRandomString: getRandomString,
 	getUser: getUser,
 	getUserFromConfirmCode: getUserForConfirmCode,
 	registerUser: registerUser,
-	sendMail: sendMail,
 	setToken: setToken,
 	updateUser: updateUser,
 	userAuthenticated: userAuthenticated,
-	userAuthentication: userAuthentication
+	userAuthentication: userAuthentication,
+	
+	addSubscription: addSubscription,
+    getSubscribers: getSubscribers,
+    hasSubscribed: hasSubscribed,
+	removeSubscription: removeSubscription
 };

@@ -13,14 +13,21 @@ var getBaseUrl = function(){
 	return url;
 };
 
+function xhrError(xhr, ajaxOptions, thrownError) {
+    //console.log(thrownError);
+    if(xhr.statusCode() == 405)
+        alert("Server bitte neustarten");
+}
+
 exports.postAceInit = function(hooks, context, cb){
+    var baseUrl = getBaseUrl();
 	$("#error").hide();
 	
 	$.ajax({
 		type: 'POST',
 		data: JSON.stringify({}),
 		contentType: 'application/json',
-		url: data.url + 'getUser',	
+		url: baseUrl + 'getUser',	
 		success: function(data) {
 			if(data.success){
 				$("#loginForm").hide();
@@ -37,27 +44,23 @@ exports.postAceInit = function(hooks, context, cb){
 				$("#logout").hide();
 			};	
 		},
-		error: function (xhr, ajaxOptions, thrownError) {
-			//console.log(thrownError);
-			if(xhr.statusCode() == 405)
-				alert("Server bitte neustarten");
-		}
+		error: xhrError
 	});
 	
 	$("#login").click(function(e) {
 		$("#error").hide();
 		e.preventDefault();
-		var data = {};
-		data.email = $("#email").val();
-		data.password = $("#password").val();
-		data.url = getBaseUrl();
-		data.readOnlyId = context.pad.getPadId();
 		
 		$.ajax({
 			type: 'POST',
-			data: JSON.stringify(data),
+			data: JSON.stringify({
+	            email : $("#email").val(),
+	            password : $("#password").val(),
+	            url : baseUrl,
+	            readOnlyId : context.pad.getPadId()
+	        }),
 			contentType: 'application/json',
-			url: data.url + 'login',	
+			url: baseUrl + 'login',	
 			success: function(data) {
 				if(data.success){
 					if(data.padId) {
@@ -69,39 +72,61 @@ exports.postAceInit = function(hooks, context, cb){
 					$("#error").html(data.error).show();
 				};	
 			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				if(xhr.statusCode() == 405)
-					alert("Server bitte neustarten");
-			}
+			error: xhrError
 		});
 	});
 	
 	$("#logout").click(function(e) {
 		e.preventDefault();
-		var data = {};
-		data.url = getBaseUrl();
-		data.padId = context.pad.getPadId();
 		
 		$.ajax({
 			type: 'POST',
-			data: JSON.stringify(data),
+			data: JSON.stringify({
+	            url : baseUrl,
+	            padId : context.pad.getPadId()
+	        }),
 			contentType: 'application/json',
-			url: data.url + 'logout',	
+			url: baseUrl + 'logout',	
 			success: function(data) {
 				if(data) {
 					window.location.href = getBaseUrl();
 				} else {
-					//console.log(data.error);
 					$("#error").val("Logout returned false?").show().delay(2000).fadeOut(1000);
 				};	
 			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				//console.log(thrownError);
-				if(xhr.statusCode() == 405)
-					alert("Server bitte neustarten");
-			}
+			error: xhrError
 		});
 	});
 	
-	
+    $.ajax({
+        type: 'POST',
+        data: JSON.stringify({action: "status", padId: context.pad.getPadId()}),
+        contentType: 'application/json',
+        url: baseUrl + 'subscribe',  
+        success: function(data) {
+            if(data.success){
+                $('#options-emailNotifications').prop('checked', data.status);
+            }else{
+                //TODO
+            };  
+        },
+        error: xhrError
+    });
+
+    $('#options-emailNotifications').on('click', function() {
+        var action = $('#options-emailNotifications').prop("checked") ? "set" : "clear";
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify({action: action, padId: context.pad.getPadId()}),
+            contentType: 'application/json',
+            url: baseUrl + 'subscribe',  
+            success: function(data) {
+                //TODO
+                if(data.success){
+                }else{
+                };  
+            },
+            error: xhrError
+        });
+    });
 };

@@ -272,6 +272,33 @@ exports.expressCreateServer = function (hook_name, args, cb) {
             });
         });
     });
+    
+    args.app.post("/subscribe", function(req, res) {
+        new formidable.IncomingForm().parse(req, function (err, fields) {
+            um.userAuthenticated(req, function (authenticated) {
+                if (authenticated) {
+                    if(fields.action == "set") {
+                        um.addSubscription(req.session.email, fields.padId);
+                        res.send({success:true});
+                    }
+                    else if(fields.action == "clear") {
+                        um.removeSubscription(req.session.email, fields.padId);
+                        res.send({success:true});
+                    }
+                    else if(fields.action == "status") {
+                        um.hasSubscribed(req.session.email, fields.padId, function(subscribed){
+                            res.send({success:true, status: subscribed});
+                        });
+                    }
+                    else
+                        res.send({success:false, error: "Unkown action"});
+                } else {
+                    res.send({success:false, error:"You are not logged in!!"});
+                }
+            });
+        });
+    });
+    
     return cb();
 
 };
@@ -282,12 +309,21 @@ exports.eejsBlock_indexWrapper = function (hook_name, args, cb) {
 };
 
 exports.eejsBlock_styles = function (hook_name, args, cb) {
-	args.content = args.content + "<link href='../static/plugins/ep_user_auth/static/css/styles.css' rel='stylesheet'>\n";
+	//args.content = args.content + "<link href='../static/plugins/ep_user_auth/static/css/styles.css' rel='stylesheet'>\n";
+    args.content = args.content + '<link href="../static/plugins/ep_user_auth/static/css/notifications.css" rel="stylesheet">';
     return cb();
 };
 
 exports.eejsBlock_scripts = function (hook_name, args, cb) {
-	args.content = args.content + "<script type=\"text/javascript\" src='../static/plugins/ep_user_auth/static/js/login.js'></script>\n";
+	//args.content = args.content + 
+    //    "<script type=\"text/javascript\" src='../static/plugins/ep_user_auth/static/js/login.js'></script>\n";
+    //args.content = args.content + 
+    //    "<script type='text/javascript' src='../static/plugins/ep_user_auth/static/js/ep_email.js'></script>\n";
+    return cb();
+};
+
+exports.eejsBlock_mySettings = function (hook_name, args, cb) {
+    args.content = args.content + eejs.require('ep_user_auth/templates/padSettings.ejs');
     return cb();
 };
 
