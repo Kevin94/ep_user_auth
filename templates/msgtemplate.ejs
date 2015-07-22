@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title lang="en">Etherpad</title>
+	<script>
+	function toIndex(){
+		setTimeout(function(){window.location = "./../"}, 3000);
+	};
+	</script>
+</head>
+<body onload="toIndex();">
+	<div id="wrapper">
+		<div id="main">
+			<div id="title">
+				<span id="mainTitle" lang="en">Etherpad</span>
+			</div>
+			<div class="inside">
+				<div>
+					<h1 lang="en" class="middleArea"><%= msg %></h1>
+				</div>
+				<div style="clear: both"></div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

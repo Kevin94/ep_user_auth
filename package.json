@@ -1,9 +1,15 @@
 {
-	"name": "ep_PLUGINNAME",
-	"version": "0.0.1",
-	"description": "DESCRIPTION",
-	"author": "USERNAME (REAL NAME) <MAIL@EXAMPLE.COM>",
-	"contributors": [],
-	"dependencies": {"MODULE": "0.3.20"},
-	"engines": { "node": ">= 0.6.0"}
+  "name": "ep_user_auth",
+  "description": "A simple authentification based on registration",
+  "version": "0.0.1",
+  "author": {
+    "name": "Kevin94"
+  },
+  "dependencies": {
+    "formidable": "1.0.14",
+    "connect": "2.4.x",
+    "emailjs": "0.3.4",
+    "crypto": "0.0.3",
+    "nodemailer": "0.5.2"
+  }
 }

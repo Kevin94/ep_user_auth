@@ -1,0 +1,85 @@
+#overlay {
+  position: fixed; 
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color:#000;
+  -ms-filter: "Alpha(Opacity=50)"; /* IE 8 */
+  filter:alpha(opacity=50); /* IE5-7 */
+  -moz-opacity: 0.50; /* Mozilla */
+  opacity: 0.50;
+}
+
+.lightBox {
+  position:fixed;
+  top:50%;
+  left:50%;
+  margin-left:-275px;
+  z-index:1000;
+  width:550px;
+  background-color:#fff;
+  border: 9px solid;
+}
+
+.lightBox .overlayLoginArea {
+  float: left;
+  width: 50%; 
+}
+.lightBox #lightBoxHeader {
+  padding: 7px 7px;
+  height: 16px;
+  text-align: right;
+}
+
+.lightBox .close {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.lightBox .content {
+  margin: 20px 30px 25px 30px;
+}
+
+.lightBox .headline {
+  margin-left: 30px;
+}
+
+
+.lightBox label {
+  display: block;
+  font-size: 11pt;
+  margin-bottom: 3px;
+}
+
+.lightBox input[type=text], .lightBox input[type=password]{
+  display: block;
+  width: 250px;
+}
+
+#overlayOptions {
+  position: absolute;
+  margin-top: 5px;
+  margin-left: -87px;
+  width: 110px;
+  border: 2px solid @main-color;
+  background-color: white;
+  ul {
+    margin: 0;
+    padding: 6% 4% 4% 4%;
+    li {
+      list-style-type: none;
+      text-align: right;
+      font-size: 7pt;
+      .link-main;
+    }
+  }
+}
+
+#error {
+  padding: 1px 30px;
+  background-color: red;
+  text-align: center;
+  font-size: 7pt;
+  color: white;
+}

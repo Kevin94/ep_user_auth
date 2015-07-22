@@ -1,0 +1,15 @@
+{
+    "smtp": "false",
+    "user": "mustermann@example.com",
+    "password": "yourpassword",
+    "host": "smtp.example.com",
+    "port": "465",
+    "tls": "false",
+    "ssl": "true",
+    "from": "mustermann@example.at",
+    
+    "registrationtext": "Hello,\n\nYour registration at Etherpad was successfull! To complete your registration please click on the following link: <url> \nAfter completing registration, please log in with your new account.",
+    "registrationsubject": "[Etherpad] Registration",
+    "resetpwmsg": "Your new Password for your etherpad Account: <password>",
+    "resetsubject": "Password reset for Etherpad-lite"
+}

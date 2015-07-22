@@ -1,0 +1,12 @@
+<form id="loginForm" method="post" action="/login">
+	<input type="text" name="email" id="email" placeholder="E-Mail"><br>
+	<input type="password" name="password" id="password" placeholder="Passwort"><br>
+	<input type="hidden" name="redirect" value="true"><br>
+	<div id="error" style="color: red;"></div>
+	<a href='/register.html' target='_blank'>Registrieren</a>
+	<button id="login" type="submit" style="float: right;">Login</button>
+</form>
+<form id="logoutForm" method="post" action="/logout">
+	<input type="hidden" name="redirect" value="true"><br>
+	<button id="logout" type="submit">Logout</button>
+</form>

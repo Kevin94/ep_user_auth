@@ -1,0 +1,44 @@
+#loginForm, #logoutForm {
+	height: auto;
+	position: static;
+	background: none;
+}
+#loginForm {
+	margin: 20px auto;
+	max-width: 300px;
+	padding-bottom: 15px;
+}
+
+#logoutForm {
+	text-align: center;
+	border: medium none;
+}
+
+#loginForm input{
+    position: static;
+	height: auto;
+    width: 100%;
+    
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    box-sizing: border-box;
+    line-height: 36px;
+    outline: medium none;
+    padding: 0 10px;
+    margin: 2px 0;
+}
+
+#loginForm button, #logoutForm button{
+	position: static;
+	height: auto;
+	width: auto;
+}
+
+#error {
+	display: none;
+}
+
+/*Create Pad with Random Id:*/
+#button {
+	display: none;
+}

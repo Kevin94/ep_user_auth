@@ -1,13 +1,15 @@
 {
-    "parts": [
-        {
-            "name": "PLUGINNAME",
-            "hooks": {
-                "HOOKNAME" : "ep_FOLDERNAME/index:FUNCTIONNAME1"
-            },
-            "client_hooks": {
-                "CLIENT_HOOKNAME" : "ep_FOLDERNAME/static/js/index:FUNCTIONNAME1"
-            }
-        }
-    ]
+  "parts": [
+    {
+      "name": "ep_user_auth",
+      "hooks": {
+        "expressCreateServer": "ep_user_auth/hooks",
+        "eejsBlock_userlist" : "ep_user_auth/hooks",
+        "eejsBlock_indexWrapper" : "ep_user_auth/hooks"
+      },
+      "client_hooks" : {
+		"postAceInit" : "ep_user_auth/static/js/login"
+      }
+    }
+  ]
 }

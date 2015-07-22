@@ -1,0 +1,117 @@
+<%
+  var settings = require("ep_etherpad-lite/node/utils/Settings")
+    , hooks = require('ep_etherpad-lite/static/js/pluginfw/hooks')
+    , langs = require("ep_etherpad-lite/node/hooks/i18n").availableLangs
+    ;
+%>
+<!doctype html>
+<html>
+        <title><%=settings.title%></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+        <link rel="shortcut icon" href="<%=settings.favicon%>">
+
+		<!--<link href='./static/plugins/ep_user_auth/static/css/index.css' rel='stylesheet'> -->
+		
+
+        <link rel="localizations" type="application/l10n+json" href="../locales.json" />
+        <script type="text/javascript" src="./static/js/html10n.js"></script>
+        <script type="text/javascript" src="./static/js/l10n.js"></script>
+
+        <!-- head and body had been removed intentionally -->
+
+		<div id="registrationDialog">
+			<div class="headline">
+				<h1>Register</h1>
+			</div>
+			<div class="content">
+				<form id="emailAuth">
+					<label for="fullname">Name</label><br>
+					<input type="text" name="fullname" id="fullname" placeholder="Name"><br>
+					<label for="email">E-Mail</label><br>
+					<input type="text" name="email" id="email" placeholder="E-Mail"><br>
+					<label for="password">Password</label><br>
+					<input type="password" name="password" id="password" placeholder="Passwort"><br>
+					<input type="password" name="passwordrepeat" id="passwordrepeat" placeholder="Passwort wiederholen"><br>
+					<div id="error"> </div>
+					<button id="register">Registrieren</button>
+				</form>
+			</div>
+		</div>
+		<div id="success">
+			<div class="headline">
+				<h1>Registration completed</h1>
+			</div>
+			<label>Please check your E-mail to complete the registration.</label>
+		</div>
+
+        <script type="text/javascript" src="./static/js/require-kernel.js"></script>
+        <script type="text/javascript" src="./socket.io/socket.io.js"></script>
+		
+		<!-- Include base packages manually (this help with debugging) -->
+    	<script type="text/javascript" src="./javascripts/lib/ep_etherpad-lite/static/js/ace2_common.js?callback=require.define"></script>
+
+        <!-- Bootstrap page -->
+        <script type="text/javascript">
+            (function () {
+              var pathComponents = location.pathname.split('/');
+
+              // Strip 'p' and the padname from the pathname and set as baseURL
+              var baseURL = pathComponents.slice(0,pathComponents.length-1).join('/') + '/';
+
+              require.setRootURI(baseURL + "javascripts/src");
+              require.setLibraryURI(baseURL + "javascripts/lib");
+              require.setGlobalKeyPath("require");
+
+              $ = jQuery = require('ep_etherpad-lite/static/js/rjquery').jQuery; // Expose jQuery #HACK
+            })();
+        </script>
+        
+        <script type="text/javascript">
+        var getBaseUrl = function(){
+        	var  loc = document.location;
+        	var port = loc.port == "" ? (loc.protocol == "https:" ? 443 : 80) : loc.port;
+        	var url = loc.protocol + "//"+ loc.hostname +":"+ loc.port
+        	var pathComponents = location.pathname.split('/');
+        	pathComponents.pop(); //drop filename
+        	baseURL = pathComponents.join('/') + '/';
+
+        	url = url + baseURL;
+//        	console.log(">>>>>");
+//        	console.log(url);
+//        	console.log("<<<<<<<<<");
+        	return url;
+        };
+		
+        $("#success").hide();
+        $("#register").click(function(e) {
+    		e.preventDefault();
+    		var data = {};
+    		data.email = $("#email").val();
+    		data.password = $("#password").val();
+    		data.fullname = $("#fullname").val();
+    		data.passwordrepeat = $("#passwordrepeat").val();
+    		data.location = getBaseUrl();
+    		$.ajax({
+    			type: 'POST',
+    			data: JSON.stringify(data),
+    			contentType: 'application/json',
+    			url: data.location + 'register',	
+    			success: function(data) {
+    				if(data.success) {
+    					$("#registrationDialog").hide();
+    					$("#success").fadeIn(1000);
+    				}else{
+    					//console.log(data.error);
+    					$("#error").val(data.error).show();
+    				}
+    			},
+    			error: function (xhr, ajaxOptions, thrownError) {
+    				//console.log(thrownError);
+    				if(xhr.statusCode() == 405)
+    					alert("Server bitte neustarten");
+    			}
+    		});
+    	});
+        </script>
+</html>
