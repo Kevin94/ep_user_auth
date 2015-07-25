@@ -1,14 +1,83 @@
-  <div class="ep_email_settings">
-    <form id='ep_email_form_mysettings'>
-      <label data-l10n-id="ep_user_auth.formOptionsTitle"></label>
-      <br />
-      <input name='ep_email_onStart' type="checkbox" class="ep_email_checkbox"></input>
-      <label for="ep_email_onStart" data-l10n-id="ep_user_auth.formOptionOnStart"></label>
-      <br />
-      <input name='ep_email_onEnd' type="checkbox" class="ep_email_checkbox"></input>
-      <label for="ep_email_onEnd" data-l10n-id="ep_user_auth.formOptionOnEnd"></label>
-      <br />
-      <button name='ep_email_subscribe' type=button class="ep_email_buttons" data-l10n-id="ep_user_auth.formBtnSubscr"></button>
-      <button name='ep_email_unsubscribe'type=button class="ep_email_buttons" data-l10n-id="ep_user_auth.formBtnUnsubscr"></button>
-    </form>
-  </div>
+<html>
+  <head>
+    <title data-l10n-id="ep_user_auth.settingsTitle">Settings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <link rel="stylesheet" href="./static/plugins/ep_user_auth/static/css/notifications.css">
+    
+    <script src="./static/js/jquery.js"></script>
+    <script src="./socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="./static/js/require-kernel.js"></script>
+    <script type="text/javascript" src="./socket.io/socket.io.js"></script>
+
+    <!-- Include base packages manually (this help with debugging) -->
+    <script type="text/javascript" src="./javascripts/lib/ep_etherpad-lite/static/js/ace2_common.js?callback=require.define"></script>
+
+    <!-- Bootstrap page -->
+    <script type="text/javascript">
+      var clientVars = {};
+      var baseUrl;
+      (function () {
+        var pathComponents = location.pathname.split('/');
+              
+        // Strip filename from the pathname and set as baseUrl
+        baseUrl = pathComponents.slice(0,pathComponents.length-1).join('/') + '/';
+
+        require.setRootURI(baseUrl + "javascripts/src");
+        require.setLibraryURI(baseUrl + "javascripts/lib");
+        require.setGlobalKeyPath("require");
+
+        $ = jQuery = require('ep_etherpad-lite/static/js/rjquery').jQuery; // Expose jQuery #HACK
+
+        if ((!$.browser.msie) && (!($.browser.mozilla && $.browser.version.indexOf("1.8.") == 0))) {
+          document.domain = document.domain; // for comet
+        }
+      }());
+    </script>
+    
+	<link rel="localizations" type="application/l10n+json" href="./locales.json" />
+	<script type="text/javascript" src="./static/js/html10n.js"></script>
+	<script type="text/javascript" src="./static/js/l10n.js"></script>
+	
+	<script type='text/javascript' src='./static/plugins/ep_user_auth/static/js/settings.js'></script>
+  </head>
+  <body>
+  	<h1 data-l10n-id="ep_user_auth.settingsTitle"></h1>
+  	<p>
+  		<h2 id="subscription" data-l10n-id="ep_user_auth.subscriptionTitle"> </h2>
+	    <form>
+	      	<label data-l10n-id="ep_user_auth.formSubscriptionTitle"></label><br>
+	      	<input name='onStart' type="checkbox" <%=onStart%>>
+		    <label for="onStart" data-l10n-id="ep_user_auth.formOnStart"></label><br>
+	      	<input name='onEnd' type="checkbox" <%=onEnd%>>
+	      	<label for="onEnd" data-l10n-id="ep_user_auth.formOnEnd"></label><br>
+	      	<button id="submitSubscription" data-l10n-id="ep_user_auth.formSettingsSubmit"></button>
+	    </form>
+    </p>
+  	<p>
+  		<h2 id="name" data-l10n-id="ep_user_auth.nameTitle"> </h2>
+	    <form>
+	      	<label for="email" data-l10n-id="ep_user_auth.formEmail"></label>:
+	    	<input name="email" type="text" disabled value="<%=email%>"><br>
+	      	<label for="fullname" data-l10n-id="ep_user_auth.formUserName"></label>:
+	    	<input name="fullname" type="text" value="<%=fullname%>"><br>
+	      	<label for="displayName" data-l10n-id="ep_user_auth.formDisplayName"></label>:
+	    	<input name="displayName" type="text" value="<%=authorName%>"><br>
+	      	<button id="submitNames" data-l10n-id="ep_user_auth.formSettingsSubmit"></button>
+	    </form>
+    </p>
+  	<p>
+  		<h2 id="password" data-l10n-id="ep_user_auth.passwordTitle"> </h2>
+	    <form>
+	      	<label for="passwordOld" data-l10n-id="ep_user_auth.formPasswordOld"></label>:
+	    	<input name="passwordOld" type="password"><br>
+	      	<label for="passwordNew" data-l10n-id="ep_user_auth.formPasswordNew"></label>:
+	    	<input name="passwordNew" type="password"><br>
+	      	<label for="passwordNewRepeat" data-l10n-id="ep_user_auth.formPasswordRepeat"></label>:
+	    	<input name="passwordNewRepeat" type="password"><br>
+	      	<button id="submitPassword" data-l10n-id="ep_user_auth.formSettingsSubmit"></button>
+	    </form>
+    </p>
+    <p id="error">
+    </p>
+  </body>
+</html>

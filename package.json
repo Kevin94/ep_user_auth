@@ -1,7 +1,7 @@
 {
   "name": "ep_user_auth",
   "description": "A simple authentification based on registration",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Kevin94"
   },

@@ -80,8 +80,7 @@ function getKey(email) {
 }
 
 function userAuthenticated(req, cb) {
-    log('debug', 'userAuthenticated');
-    if (req.session.username && req.session.password && req.session.email) {
+    if (req.session.password && req.session.email) {
         cb(true);
     } else {
         cb(false);
@@ -89,7 +88,6 @@ function userAuthenticated(req, cb) {
 };
 
 function userAuthentication(email, password, cb) {
-    log('debug', 'userAuthentication');
     getUser(email, function (user) {
         if(user!=null)
 			if (user.pswd == encryptPassword(password) && user.considered) {
@@ -102,11 +100,23 @@ function userAuthentication(email, password, cb) {
     });
 };
 
-function getUser(email, cb) {
-    log('debug', 'getUser');
-    db.get(getKey(email), function(err, user){
-		cb(user); //null if error
-	});
+function getUser(email, cb, lookupAuthorName) {
+    if(lookupAuthorName) {
+        db.get(getKey(email), function(err, user) {
+            if(user) {
+                authorManager.getAuthorName(user.author, function(err, authorName){
+                    user.authorName = authorName;
+                    cb(user);
+                });
+            } else {
+                cb(null);
+            }
+        });
+    } else {
+        db.get(getKey(email), function(err, user){
+            cb(user); //null if error
+        });
+    }
 }
 
 function updateUser(user) {
@@ -210,6 +220,10 @@ function setToken(user, token) {
 	}
 }
 
+function setAuthorName(user, name) {
+    authorManager.setAuthorName(user.author, name);
+}
+
 function addSubscription(email, padId) {
     db.get("subscribers:"+padId, function(err, subscribers){
         if(!subscribers) 
@@ -287,6 +301,7 @@ module.exports = {
 	getUserFromConfirmCode: getUserForConfirmCode,
 	registerUser: registerUser,
 	setToken: setToken,
+	setAuthorName: setAuthorName,
 	updateUser: updateUser,
 	userAuthenticated: userAuthenticated,
 	userAuthentication: userAuthentication,

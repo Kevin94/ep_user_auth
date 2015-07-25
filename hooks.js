@@ -70,6 +70,32 @@ exports.expressCreateServer = function (hook_name, args, cb) {
     args.app.get('/register.html', function (req, res) {
         sendTemplate(res, "register.ejs", {});
     });
+    
+    args.app.get('/settings.html', function (req, res) {
+        um.userAuthenticated(req, function (authenticated) {
+            if (authenticated) {
+                um.getUser(req.session.email, function(user) {
+                    if(user){
+                        function check(prop) {
+                            return (typeof(user[prop]) == "undefined" || user[prop])?"checked":"";
+                        }
+                        var render_args = {
+                            email: user.email,
+                            fullname: user.fullname,
+                            onStart: check("startedEdit"),
+                            onEnd:   check("stoppedEdit"),
+                            authorName: user.authorName
+                        };
+                        sendTemplate(res, "settings.ejs", render_args);
+                    } else {
+                        sendError(res, "User not found!");
+                    }
+                }, true); //<-- lookup author data;
+            } else {
+                sendMessage(res, "You are not logged in!");
+            }
+        });
+    });
 
     args.app.post('/login', function (req, res) {
         new formidable.IncomingForm().parse(req, function (err, fields) {
@@ -192,7 +218,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                     res.send(data);
                 });
             } else {
-                res.send({success:false,serror:"You are not logged in!!"});
+                res.send({success:false, error:"You are not logged in!!"});
             }
         });
     });
@@ -201,20 +227,21 @@ exports.expressCreateServer = function (hook_name, args, cb) {
         new formidable.IncomingForm().parse(req, function (err, fields) {
             um.userAuthenticated(req, function (authenticated) {
                 if (authenticated) {
-                    if (fields.newUserName == "") {
-                        sendError('User Name empty', res);
+                    if( !(fields.newUserName && fields.newAuthorName)) {
+                        res.send({success:false, error:"The new name is empty!!"});
                     }
                     else {
 						um.getUser(req.session.email, function(user) {
 							if(user!=null) {
 								user.fullname = fields.newUserName;
 								um.updateUser(user);
+								um.setAuthorName(user, fields.newAuthorName);
 							}
 							res.send({success:user!=null});
 						});
 					}
                 } else {
-                    res.send("You are not logged in!!");
+                    res.send({success:false, error:"You are not logged in!!"});
                 }
             });
         });
@@ -225,18 +252,18 @@ exports.expressCreateServer = function (hook_name, args, cb) {
             um.userAuthenticated(req, function (authenticated) {
                 if (authenticated) {
                     if (fields.newPW == "" || fields.oldPW == "") {
-                        sendError('Password empty', res);
+                        res.send({success:false, error:"Password empty!"});
                         return;
                     }
                     um.changePw(req.session.email, fields.oldPW, fields.newPW, function (success, err) {
 						if(!success) {
-							sendError(err, res);
+		                    res.send({success:false, error:"Error (Wrong old Password?)"});
 						} else {
 							res.send({success:true});
 						}
                     });
                 } else {
-                    res.send("You are not logged in!!");
+                    res.send({success:false, error:"You are not logged in!!"});
                 }
             });
         });
@@ -290,6 +317,20 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                             res.send({success:true, status: subscribed});
                         });
                     }
+                    else if(fields.action == "settings") {
+                        if(fields.onStart==null || fields.onEnd==null){
+                            res.send({success:false, error:"Parameter missing!"});
+                            return;
+                        }
+                        um.getUser(req.session.email, function(user) {
+                            if(user!=null){
+                                user.startedEdit = fields.onStart;
+                                user.stoppedEdit = fields.onEnd;
+                                um.updateUser(user);
+                            }
+                            res.send({success:user!=null});
+                        });
+                    }
                     else
                         res.send({success:false, error: "Unkown action"});
                 } else {
@@ -310,7 +351,7 @@ exports.eejsBlock_indexWrapper = function (hook_name, args, cb) {
 
 exports.eejsBlock_styles = function (hook_name, args, cb) {
 	//args.content = args.content + "<link href='../static/plugins/ep_user_auth/static/css/styles.css' rel='stylesheet'>\n";
-    args.content = args.content + '<link href="../static/plugins/ep_user_auth/static/css/notifications.css" rel="stylesheet">';
+    //args.content = args.content + '<link href="../static/plugins/ep_user_auth/static/css/notifications.css" rel="stylesheet">';
     return cb();
 };
 
